@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>First-class Obj & add_maker & FtnByFtn</title>
+  </head>
+  <body>
+    <script>
+      //First-class Obj
+      //To put a Ftn in a Variables
+      const add = (a, b) => a + b;
+      function add2(a, b) {
+        return a + b;
+      }
+      const f1 = function(a, b) {
+        return a + b;
+      };
+      console.log(add); // Arrow Ftn
+      console.log(add2); // named Ftn
+      console.log(f1); // anonymous Ftn
+      console.log(typeof f1); // Ftn
+      console.log(typeof add2);
+      console.log(typeof add); // Ftn
+
+      // To put a Ftn in a Ftn
+      // 언제 평가해도 상관없는 순수함수들을 많이 만든다.
+      // => 그러한 함수들을 변수, 객체? 에 넣어(일급함수) 적절한 시점에 불러내 평가(실행?)한다.
+      // => 다양한 로직을 만들어 낸다.
+      const f2 = f => f();
+      const f3 = () => 10;
+      console.log("f2(f3):", f2(f3));
+      console.log(
+        f2(function() {
+          return 2;
+        })
+      );
+
+      // add_maker
+      // ES5
+      const add_maker = a => {
+        return function(b) {
+          return a + b;
+        };
+      };
+      const add10 = add_maker(10);
+      console.log("ES5:", add10);
+      console.log(add10(20));
+
+      // Arrow Ftn
+      const add_maker2 = a => b => a + b;
+      const add102 = add_maker2(102);
+      console.log("Arrow Ftn:", add102);
+      console.log(add102(202));
+      // => it's Closure, remember value of a
+      // => & referred to only, not change initialized value.
+      // => Used Pure Ftn
+
+      const add15 = add_maker(15);
+      const add30 = add_maker(30);
+      console.log(add15(15));
+      console.log(add30(30));
+
+      //ES5
+      function f4(f1, f2, f3) {
+        return f3(f1() + f2());
+      }
+      console.log(
+        "ES5:",
+        f4(
+          function() {
+            return 2;
+          },
+          function() {
+            return 1;
+          },
+          function(a) {
+            return a * a;
+          }
+        )
+      );
+
+      // Arrow Ftn
+      const f5 = (f1, f2, f3) => f3(f1() + f2());
+      console.log("Arrow Ftn:", f5(() => 2, () => 1, a => a * a));
+
+      // 위와 같은 형태의 함수를 자주 사용한다.
+      // 원하는 순수함수 인자를 넣어 받아둔 순수 함수에 활용한다.
+      // 즉 함수를 조합한다.
+      // 원하는 방법으로 평가한다. 원하는 시점에 평가한다.
+      // => 동시성과 비동기 처리를 문제없이 다룰 수 있다.
+    </script>
+  </body>
+</html>
