@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Polymorphism</title>
+  </head>
+  <body>
+    <script>
+      // 외부 다형성
+
+      // filter, map같은 경우는 이미 method로 만들어져있다.
+      // method와 Ftn은 서로 다르다.
+      // method는 Obj에 따라 값이 다르게 나온다. 객체지향적? 프록래밍이다.
+      // method는 해당 Class의 instance에서만 사용가능하다.
+      // Obj의 종류가 다르다면 사용할 수 없다.
+
+      const allTag = document.querySelectorAll("*");
+      console.log(allTag); // Array-like thing
+      //   console.log(allTag.map(node => node.nodeName));
+      // Error: allTag is not a Ftn. it's not Array
+      // 다형성을 지원하기 어렵다.
+      // FP는 함수가 우선된다. 이후에 함수에 맞는 데이터를 구성한다.
+      /* FP를 통해 만든 map 함수는 객체의 종류와 상관없이 
+      사용 가능하게 만들 수 있다. */
+      // 다형성이 높아진다.
+      // => 유연하고 실용적이다.
+
+      //FP solution for this error
+      function _each(list, iter) {
+        for (let i = 0; i < list.length; i++) {
+          iter(list[i]);
+        }
+        return list;
+      }
+
+      function _map(list, mapper) {
+        let new_list = [];
+        _each(list, function(val) {
+          new_list.push(mapper(val));
+        });
+        return new_list;
+      }
+      console.log(_map(document.querySelectorAll("*"), node => node.nodeName));
+
+      // 내부 다형성
+      // 1. predicate, iterator, mapper (고차함수, 응용형함수)
+      /* _map(list, callbackFtn)와 같이 
+      보조함수를 뭉뚱그려 callback이라고 부르는 경향이 있다.*/
+      // 하지만 FP에선 함수의 역할에 따라 다양한 이름으로 부를 필요가 있다.
+      // callback은 앞에 있는 것들이 다 수행되고 난 뒤 끝에서 돌려준다는 의미로 사용된다면
+      // predi(조건) / iter(반복) / mapper(매핑,탐색?)이라고 분류할 수 있다.
+      // Not only callback
+      // 각각의 역할에 맞는 보조함수의 이름을 다르게 부르는 게 좋다.
+      // 내부 다형성은 보조함수가 책임진다.
+      console.log(
+        _map([1, 2, 3, 4], function(v) {
+          return v + 10;
+        })
+      );
+    </script>
+  </body>
+</html>

@@ -40,14 +40,35 @@
 ## 2. To switch to a function type
 
 - [x] listOfMember & map & filter
-- [ ] each
+- [x] each
+- [ ] Polymorphism
+- [ ] Currying, curry, curryr
+- [ ] Rudece
+- [ ] PipeLine & go & pipe, Arrow Ftn
+- [ ] To Increase polymorphism
 
 ## 3. Collection-oriented Programming
 
+- [ ]
+- [ ]
+- [ ]
+- [ ]
+- [ ]
+
 ## 4. Lazy Evaluation in Javascript
+
+- [ ]
+- [ ]
 
 ## 5. Actual Code Fragment 1
 
+- [ ]
+- [ ]
+
 ## 6. Actual Code Fragment 2
 
+- [ ]
+
 ## 7. Async
+
+- [ ]
