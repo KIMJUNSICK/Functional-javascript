@@ -41,8 +41,8 @@
 
 - [x] listOfMember & map & filter
 - [x] each
-- [ ] Polymorphism
-- [ ] Currying, curry, curryr
+- [x] Polymorphism
+- [x] Currying, curry, curryr
 - [ ] Rudece
 - [ ] PipeLine & go & pipe, Arrow Ftn
 - [ ] To Increase polymorphism

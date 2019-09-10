@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Curriyng&_curry&_currtyr</title>
+  </head>
+  <body>
+    <script>
+      // 커링은 함수와 인자를 다루는 기법이다.
+      /* 함수는 인자를 하나씩 적용하다가 필요한 인자가 모두 충족되면
+      함수를 실행한다. */
+      // 1. _curry
+      function _curry(Ftn) {
+        return function(a, b) {
+          return arguments.length == 2
+            ? Ftn(a, b)
+            : function(b) {
+                return Ftn(a, b);
+              };
+        };
+      }
+
+      function _curryr(Ftn) {
+        return function(a, b) {
+          return arguments.length == 2
+            ? Ftn(a, b)
+            : function(b) {
+                return Ftn(b, a);
+              };
+        };
+      }
+
+      // normal
+      const add = function(a, b) {
+        return a + b;
+      };
+      console.log(add(10, 5));
+
+      // Input arguments at the same time
+      const calc = (Ftn, a, b) => {
+        return Ftn(a, b);
+      };
+      console.log(calc((a, b) => a + b, 10, 5));
+
+      // _curry version
+      const Add = _curry(function(a, b) {
+        return a + b;
+      });
+
+      const Add10 = Add(10);
+      console.log(Add(10));
+      console.log(Add10(5));
+      console.log(Add(10, 5));
+      console.log(Add(10)(5));
+
+      // sub
+      const sub = _curry(function(a, b) {
+        return a - b;
+      });
+      console.log(sub(10, 5));
+      const sub10 = sub(10);
+      console.log(sub10(5));
+
+      //=> 표현식이 부자연스럽다.
+      //=> sub10이 마치 10을 뺀다고 오해받을 수 있다.
+      //=> _curryr, sub "right를 만든다.
+
+      // sub right
+      const sub2 = _curryr(function(a, b) {
+        return a - b;
+      });
+      const sub5 = sub2(5);
+      console.log(sub5);
+      console.log(sub5(10));
+      console.log(sub2(5)(10));
+      console.log(sub(10, 5));
+      // 표현에 맞게 작동한다.
+      // 인자를 오른쪽부터 적용하는 경우
+
+      // _get
+      const users = [
+        { id: 1, name: "junsik", age: 25 },
+        { id: 2, name: "jinsik", age: 25 },
+        { id: 3, name: "jonsik", age: 39 },
+        { id: 4, name: "joongsik", age: 30 },
+        { id: 5, name: "junesick", age: 26 },
+        { id: 6, name: "junesik", age: 32 },
+        { id: 7, name: "jansik", age: 33 }
+      ];
+
+      function _get(obj, key) {
+        return obj == null ? undefined : obj[key];
+      }
+
+      const user1 = users[0];
+      console.log(user1.name);
+      console.log(_get(user1, "name"));
+
+      // returned 'undefined' => more secure
+      /* console.log(users[10].name); */
+      console.log(_get(users[10], "name"));
+
+      // _get x _curryr
+      //  key first
+      const _get2 = _curryr(function(obj, key) {
+        return obj == null ? undefined : obj[key];
+      });
+      console.log(_get2("name")(user1));
+
+      const get_name = _get2("name");
+      console.log(get_name(user1));
+
+      // filter &  map
+      function _filter(array, predi) {
+        let new_list = [];
+        for (let i = 0; i < array.length; i++) {
+          if (predi(array[i])) {
+            new_list.push(array[i]);
+          }
+        }
+        return new_list;
+      }
+
+      function _map(array, mapper) {
+        let new_list = [];
+        for (let i = 0; i < array.length; i++) {
+          new_list.push(mapper(array[i]));
+        }
+        return new_list;
+      }
+
+      // compare fitlerMap and filterMapGet
+      const filterMap = _map(
+        _filter(users, function(user) {
+          return user.age >= 30;
+        }),
+        function(user) {
+          return user.name;
+        }
+      );
+
+      const filterMapGet = _map(
+        _filter(users, function(user) {
+          return user.age >= 30;
+        }),
+        _get2("name") // _get("id"), _get("age")
+      );
+      // => increase reuse, application of Ftn.
+      // => clean code
+
+      console.log(filterMap); // a
+      console.log(filterMapGet); // be equal to a
+    </script>
+  </body>
+</html>
