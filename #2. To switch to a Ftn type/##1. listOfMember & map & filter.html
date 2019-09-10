@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>listOfMember & map & filter</title>
+  </head>
+  <body>
+    <script>
+      const users = [
+        { id: 1, name: "junsik", age: 25 },
+        { id: 2, name: "jinsik", age: 25 },
+        { id: 3, name: "jonsik", age: 39 },
+        { id: 4, name: "joongsik", age: 30 },
+        { id: 5, name: "junesick", age: 26 },
+        { id: 6, name: "junesik", age: 32 },
+        { id: 7, name: "jansik", age: 33 }
+      ];
+
+      // 1. imperative programming
+      // Skip users over 30 years of age.
+      let temp_users = [];
+      for (let i = 0; i < users.length; i++) {
+        if (users[i].age >= 30) {
+          temp_users.push(users[i]);
+        }
+      }
+      console.log(temp_users);
+
+      // Collect user's name over 30 years of age.
+      let names = [];
+      for (let i = 0; i < users.length; i++) {
+        if (users[i].age >= 30) {
+          names.push(users[i].name);
+        }
+      }
+      console.log(names);
+
+      // Collect users under 30 years of age.
+      let temp_users2 = [];
+      for (let i = 0; i < users.length; i++) {
+        if (users[i].age < 30) {
+          temp_users2.push(users[i]);
+        }
+      }
+      console.log(temp_users2);
+
+      // Collect user's age over 30 years of age.
+      let ages = [];
+      for (let i = 0; i < users.length; i++) {
+        if (users[i].age >= 30) {
+          ages.push(users[i].age);
+        }
+      }
+      console.log(ages);
+
+      //2. Refactoring with _filter & _map
+      // FP for removing a repetition
+      // To delegate completely to a function.
+      // applied function
+
+      //_filter
+      function _filter(array, predi) {
+        let new_list = [];
+        for (let i = 0; i < array.length; i++) {
+          if (predi(array[i])) {
+            new_list.push(array[i]);
+          }
+        }
+        return new_list;
+        // console.log() have a secondary effect
+      }
+
+      // map
+      // 데이터의 생김새가 전혀 보이지 않는다.
+      // => 재사용성이 극대화
+      function _map(array, mapper) {
+        let new_list = [];
+        for (let i = 0; i < array.length; i++) {
+          new_list.push(mapper(array[i]));
+        }
+        return new_list;
+      }
+
+      console.log(
+        _filter(users, function(user) {
+          return user.age >= 30;
+        })
+      );
+
+      // removed a repetition
+      console.log(
+        _filter(users, function(user) {
+          return user.age < 30;
+        })
+      );
+
+      const over_30 = user => user.age > 30; // Ftn
+      console.log(_filter(users, over_30));
+
+      // Not only the user
+      console.log(
+        _filter([1, 2, 3, 4], function(numb) {
+          return numb % 2;
+        })
+      );
+      console.log(
+        _filter([1, 2, 3, 4], function(numb) {
+          return !(numb % 2);
+        })
+      );
+
+      // Collect user's name over 30 years of age.
+      const over__30 = _filter(users, user => user.age >= 30);
+      console.log(over__30);
+
+      const over__30_names = _map(over__30, user => user.name);
+      console.log(over__30_names);
+
+      // Collect user's age under 30 years of age.
+      const under_30 = _filter(users, user => user.age < 30);
+      console.log(under_30);
+
+      const handleAge = user => user.age;
+      const under_30_ages = _map(under_30, handleAge);
+      console.log(under_30_ages);
+
+      // 기존값을 바꾸는 게 아니다.
+      // 원래의 값이 함수를 지나가면서 '한번에' 새로운 값을 만드는 방식이다.
+      // => 여러 함수를 조합한다. 대입문이 줄어든다.
+
+      // mine
+      const _filterAndMap = (array, filterFtn, mapFtn) => {
+        const middle_array = _filter(array, filterFtn);
+        const new_array = _map(middle_array, mapFtn);
+        return new_array;
+      };
+
+      console.log(
+        _filterAndMap(users, user => user.age >= 30, user => user.name)
+      );
+
+      //lecture's version
+      const filterMap = (array, filterFtn, mapFtn) =>
+        _map(_filter(array, filterFtn), mapFtn);
+
+      const result = filterMap(
+        users,
+        user => user.age >= 30,
+        user => user.name
+      );
+      console.log(result);
+
+      // 대입문의 최소화로 코드가 간결해진다.
+      // 기존 값이 변하지 않기 때문에 안전성이 높아진다.
+
+      // 고차함수란?
+      // 함수를 인자로 받는다.
+      // 함수를 리턴한다.
+      // 인자로 받은 함수를 함수 내에서 실행한다.
+    </script>
+  </body>
+</html>
