@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>each</title>
+  </head>
+  <body>
+    <script>
+      const users = [
+        { id: 1, name: "junsik", age: 25 },
+        { id: 2, name: "jinsik", age: 25 },
+        { id: 3, name: "jonsik", age: 39 },
+        { id: 4, name: "joongsik", age: 30 },
+        { id: 5, name: "junesick", age: 26 },
+        { id: 6, name: "junesik", age: 32 },
+        { id: 7, name: "jansik", age: 33 }
+      ];
+
+      // Make '_each'
+      //Because of Repetition between filter and  map
+      function _each(list, iter) {
+        for (let i = 0; i < list.length; i++) {
+          iter(list[i]);
+        }
+        return list;
+      }
+
+      // _filter + _each
+      function _filter(list, predi) {
+        let new_list = [];
+        _each(list, function(val) {
+          if (predi(val)) new_list.push(val);
+        });
+        return new_list;
+      }
+      console.log(_filter(users, user => user.age >= 30));
+
+      // _map + _each
+      function _map(list, mapper) {
+        let new_list = [];
+        _each(list, function(val) {
+          new_list.push(mapper(val));
+        });
+        return new_list;
+      }
+      console.log(_map(users, user => user.name));
+
+      // before _each
+      function _filterMap(list, filterFtn, mapperFtn) {
+        let new_list = [];
+        for (let i = 0; i < list.length; i++) {
+          if (filterFtn(list[i])) {
+            new_list.push(mapperFtn(list[i]));
+          }
+        }
+        return new_list;
+      }
+
+      // Add _each
+      function _filterMap2(list, filterFtn, mapperFtn) {
+        let new_list = [];
+        _each(list, function(val) {
+          if (filterFtn(val)) {
+            new_list.push(mapperFtn(val));
+          }
+        });
+        return new_list;
+      }
+      console.log(_filterMap(users, user => user.age >= 30, user => user.name));
+      console.log(
+        _filterMap2(users, user => user.age >= 30, user => user.name)
+      );
+
+      // '반복'되는 부분을 함수로 구성한다.
+      // 모듈화 수준이 높아진다. 재사용성이 올라간다.
+      // 자신이 쓴 코드에 대한 확신이 증가한다.
+    </script>
+  </body>
+</html>

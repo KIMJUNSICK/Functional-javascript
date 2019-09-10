@@ -39,6 +39,9 @@
 
 ## 2. To switch to a function type
 
+- [x] listOfMember & map & filter
+- [ ] each
+
 ## 3. Collection-oriented Programming
 
 ## 4. Lazy Evaluation in Javascript
