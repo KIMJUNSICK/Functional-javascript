@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>reduce</title>
+  </head>
+  <body>
+    <script>
+      function _each(list, iter) {
+        for (let i = 0; i < list.length; i++) {
+          iter(list[i]);
+        }
+        return list;
+      }
+
+      // _filter + _each
+      function _filter(list, predi) {
+        let new_list = [];
+        _each(list, function(val) {
+          if (predi(val)) new_list.push(val);
+        });
+        return new_list;
+      }
+
+      // _map + _each
+      function _map(list, mapper) {
+        let new_list = [];
+        _each(list, function(val) {
+          new_list.push(mapper(val));
+        });
+        return new_list;
+      }
+
+      // Make _reduce
+      // 들어온 데이터를 축약하기 위해 사용하는 경우가 많다.
+      function _reduce(list, iter, memo) {
+        if (arguments.length == 2) {
+          memo = list[0];
+          list = list.slice(1); // but slice is Array method.
+          // it doesn't work in Array-like
+        }
+        _each(list, function(val) {
+          memo = iter(memo, val);
+        });
+        return memo;
+      }
+
+      // _rest
+      const slice = Array.prototype.slice;
+      const _rest = (list, num) => slice.call(list, num || 1); // default 1
+
+      // _reduce, Array-like is applied !
+      function _reduce2(list, iter, memo) {
+        if (arguments.length == 2) {
+          memo = list[0];
+          list = _rest(list);
+        }
+        _each(list, val => {
+          memo = iter(memo, val);
+        });
+        return memo;
+      }
+
+      const add = (a, b) => a + b;
+
+      console.log(_reduce([1, 2, 3, 4], add, 0)); // 10
+      console.log(_reduce([1, 2, 3], add)); // 6
+      console.log(_reduce2([1, 2, 3], add)); // 6
+
+      // Process of _reduce
+      // memo = add(0,1)
+      // memo = add(memo,2)
+      // memo = add(memo,3)
+      // return memo
+      // Recursive: add(add(add(0,1),2),3)
+
+      // 참고 : 화살표 함수는 arguments를 바인딩하지 않는다.
+    </script>
+  </body>
+</html>
