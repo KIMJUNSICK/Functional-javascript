@@ -43,8 +43,8 @@
 - [x] each
 - [x] Polymorphism
 - [x] Currying, curry, curryr
-- [ ] Rudece
-- [ ] PipeLine & go & pipe, Arrow Ftn
+- [x] rudece
+- [x] PipeLine & go & pipe, Arrow Ftn
 - [ ] To Increase polymorphism
 
 ## 3. Collection-oriented Programming

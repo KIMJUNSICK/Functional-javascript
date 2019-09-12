@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Document</title>
+  </head>
+  <body>
+    <script>
+      // _each
+      function _each(list, iter) {
+        for (let i = 0; i < list.length; i++) {
+          iter(list[i]);
+        }
+        return list;
+      }
+
+      // _rest
+      // is Ftn, not method
+      // => data is not changed.
+      // => The timing of the function is free.
+      const slice = Array.prototype.slice;
+      const _rest = (list, num) => slice.call(list, num || 1); // default 1
+
+      // _reduce, Array-like is applied !
+      function _reduce(list, iter, memo) {
+        if (arguments.length == 2) {
+          memo = list[0];
+          list = _rest(list);
+        }
+
+        _each(list, val => {
+          memo = iter(memo, val);
+        });
+        return memo;
+      }
+
+      // _pipe
+      // 연속적으로 함수들을 실행해준다.
+      // 마치 물이 서로 다른 파이프를 지나며 흐름이 바뀌는 것 처럼.
+      // 함수를 리턴하는 함수 => 고차함수
+      function _pipe() {
+        const fns = arguments;
+        return function(arg) {
+          return _reduce(
+            fns,
+            function(arg, fn) {
+              return fn(arg);
+            },
+            arg
+          );
+        };
+      }
+
+      const f_pipe = _pipe(
+        function(a) {
+          return a + 1;
+        },
+        function(a) {
+          return a * 2;
+        },
+        function(a) {
+          return a * a;
+        }
+      );
+
+      console.log(f_pipe(2));
+
+      // _go
+      // 즉시실행하는 _pipe 함수.
+      // arguments is Array-like Obj
+      function _go(arg) {
+        const fns = _rest(arguments);
+        return _pipe.apply(null, fns)(arg);
+        // apply is Ftn method for applying 'Array' to Ftn
+      }
+
+      const f_go = _go(
+        1,
+        function(a) {
+          return a + 1;
+        },
+        function(a) {
+          return a * 2;
+        },
+        function(a) {
+          return a * a;
+        },
+        console.log
+      );
+
+      // users에 _go 적용하기
+
+      const users = [
+        { id: 1, name: "junsik", age: 25 },
+        { id: 2, name: "jinsik", age: 25 },
+        { id: 3, name: "jonsik", age: 39 },
+        { id: 4, name: "joongsik", age: 30 },
+        { id: 5, name: "junesick", age: 26 },
+        { id: 6, name: "junesik", age: 32 },
+        { id: 7, name: "jansik", age: 33 }
+      ];
+
+      // filter _ _each
+      function _filter(list, predi) {
+        let new_list = [];
+        _each(list, function(val) {
+          if (predi(val)) new_list.push(val);
+        });
+        return new_list;
+      }
+
+      // _map + _each
+      function _map(list, mapper) {
+        let new_list = [];
+        _each(list, function(val) {
+          new_list.push(mapper(val));
+        });
+        return new_list;
+      }
+
+      // _cuuryr
+      function _curryr(Ftn) {
+        return function(a, b) {
+          return arguments.length == 2
+            ? Ftn(a, b)
+            : function(b) {
+                return Ftn(b, a);
+              };
+        };
+      }
+
+      //_get
+      const _get = _curryr(function(obj, key) {
+        return obj == null ? undefined : obj[key];
+      });
+
+      // 원래
+      console.log(
+        _map(
+          _filter(users, function(user) {
+            return user.age >= 30;
+          }),
+          _get("name")
+        )
+      );
+
+      // _go version
+      _go(
+        users,
+        function(users) {
+          return _filter(users, function(user) {
+            return user.age >= 30;
+          });
+        },
+        function(users) {
+          return _map(users, _get("name"));
+        },
+        console.log
+      );
+      //=> 순차적이다. 직관적이다.
+
+      // changed applied input order
+      const _map2 = _curryr(_map),
+        _filter2 = _curryr(_filter);
+
+      console.log(
+        _map([1, 2, 3], function(val) {
+          return val * 2;
+        })
+      );
+
+      console.log(
+        _filter2(function(val) {
+          return val * 2;
+        })
+      ); /*  f(b) {
+        return Ftn(b,a)
+       }
+       */
+
+      // _go + curryr
+      _go(
+        users,
+        _filter2(function(user) {
+          return user.age >= 30;
+        }),
+        _map2(_get("name")),
+        console.log
+      );
+      //=> 더욱 간결해졌다. 체인과 같은 표현.
+
+      // _go with Arrow Ftn
+      _go(
+        users,
+        _filter2(user => user.age >= 30),
+        _map2(_get("name")),
+        console.log
+      );
+
+      // Arrow Ftn
+      // const a = (a, b) => ({ val: a + b });
+      // => { }, 중괄호만 쓰면 함수가 아닌 객체의 소유가 되므로 소괄호를 바깥에 추가.
+    </script>
+  </body>
+</html>
