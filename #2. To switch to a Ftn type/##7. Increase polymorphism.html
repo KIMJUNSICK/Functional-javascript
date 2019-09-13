@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Increase polymorphism</title>
+  </head>
+  <body>
+    <script>
+      // Increase external polymorphism of _each
+      // existing thing
+      function _each(list, iter) {
+        for (let i = 0; i < list.length; i++) {
+          iter(list[i]);
+        }
+        return list;
+      }
+
+      //   _each(null, console.log);
+      // no length
+      // => error
+
+      // solution: add _get
+      //  _curryr
+      function _curryr(Ftn) {
+        return function(a, b) {
+          return arguments.length == 2
+            ? Ftn(a, b)
+            : function(b) {
+                return Ftn(b, a);
+              };
+        };
+      }
+
+      // _get
+      const _get = _curryr(function(obj, key) {
+        return obj == null ? undefined : obj[key];
+      });
+
+      console.log(_get("length"));
+
+      const _length = _get("length");
+
+      function _each(list, iter) {
+        for (let i = 0, len = _length(list); i < len; i++) {
+          iter(list[i]);
+        }
+        return list;
+      }
+
+      // map
+      function _map(list, mapper) {
+        let new_list = [];
+        _each(list, function(val) {
+          new_list.push(mapper(val));
+        });
+        return new_list;
+      }
+
+      _each(null, console.log); // no error
+      console.log(_map(null, v => v)); // []
+      // FP에선 예외적인 데이터가 들어와도 error가 나지 않게
+      // 그리고 데이터 형체크 or try & catch를 하지 않는다.
+      // 위의 방식처럼 흘려보낸다.
+      // 답이 나오도록 유도하는 걸 고려해야한다.
+      // 데이터를 다루는 기법 중 하나다.
+
+      // Object.keys (method)
+      // key:value 에서 key만 뽑아낼 때
+      console.log(Object.keys({ name: "junsik", age: "25" }));
+      // => ["name", "key"]
+      console.log(Object.keys([1, 2, 3, 4])); // ["1", "2" ,"3", "4"]
+      console.log(Object.keys(10)); // []
+      //   console.log(Object.keys(null)); // => error
+
+      // Make _keys
+      // Ftn, not method
+      // make program more secure
+      function _is_object(obj) {
+        return typeof obj == "object" && !!obj;
+      }
+
+      function _keys(obj) {
+        return _is_object(obj) ? Object.keys(obj) : [];
+      }
+
+      console.log(_keys({ name: "junsik", age: "25" })); // => ["name", "key"]
+      console.log(_keys([1, 2, 3, 4])); // ["1", "2" ,"3", "4"]
+      console.log(_keys(10)); // []
+      // console.log(Object.keys(null)); // => error
+      console.log(_keys(null)); // []
+
+      // Increase external polymorphism of _each 2
+      const member = {
+        0: "junsdfdik",
+        1: "junsik",
+        2: "juasdnssdfik",
+        3: "junasddsfgsik",
+        4: "junsaasdik"
+      };
+
+      _each(member, function(name) {
+        console.log(name);
+      }); // no result
+
+      // _each + _keys
+      function _each2(list, iter) {
+        const keys = _keys(list);
+        for (let i = 0; i < keys.length; i++) {
+          iter(list[keys[i]]);
+        }
+        return list;
+      }
+
+      _each2(member, function(name) {
+        console.log(name);
+      });
+
+      // _each2 + _map2
+      function _map2(list, mapper) {
+        let new_list = [];
+        _each2(list, function(val) {
+          new_list.push(mapper(val));
+        });
+        return new_list;
+      }
+
+      console.log(
+        _map2(member, function(name) {
+          return name.toUpperCase();
+        })
+      );
+
+      // FP에서 다형성이 높다.
+      // => 데이터에 따라 개발자가 유연하게 대처할 가능성이 높다.
+      // => 데이터 형태의 따라서 내부동작이 다 돌아가도록.
+      // => 인자가 부족하게 들어왔다면 함수를 return 하도록.
+      // => 즉 어떤 예외적인 데이터가 들어와도 흘러가도록 만든다.
+    </script>
+  </body>
+</html>
