@@ -45,15 +45,15 @@
 - [x] Currying, curry, curryr
 - [x] rudece
 - [x] PipeLine & go & pipe, Arrow Ftn
-- [ ] To Increase polymorphism
+- [x] To Increase polymorphism
 
 ## 3. Collection-oriented Programming
 
-- [ ]
-- [ ]
-- [ ]
-- [ ]
-- [ ]
+- [ ] To Collect - map, values, pluck
+- [ ] To Filter - reject, compact
+- [ ] To Find - find, find_index, some, every
+- [ ] To Fold - reduce, min_by, max_by
+- [ ] To Fold - group_by, count_by
 
 ## 4. Lazy Evaluation in Javascript
 

@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Collection-orienter Programming</title>
+  </head>
+  <body>
+    <script>
+      // Four type & Ftn of Collection-oriented Programming
+      // 1. 수집하기 - map, values, pluck etc...
+      // 2. 거르기 - filter, reject, compact, without etc...
+      // 3. 찾아내기 - find, some, every etc...
+      // 4. 접기(축약) - reduce, min, max, group_by, count_by
+      // 맨 앞의 함수가 가장 추상화 수준이 높다.
+      // => 뒤의 것들은 상대적으로 특화된 함수들.
+      // => 목표: 문제(상황)에 맞게 알맞는 함수를 꺼내쓴다.
+
+      const users = [
+        { id: 1, name: "junsik", age: 25 },
+        { id: 2, name: "jinsik", age: 25 },
+        { id: 3, name: "jonsik", age: 39 },
+        { id: 4, name: "joongsik", age: 30 },
+        { id: 5, name: "junesick", age: 26 },
+        { id: 6, name: "junesik", age: 32 },
+        { id: 7, name: "jansik", age: 33 }
+      ];
+
+      // 1. 수집하기 - map
+
+      // Make _keys
+      // Ftn, not method
+      // make program more polymorphic
+      function _is_object(obj) {
+        return typeof obj == "object" && !!obj;
+      }
+
+      function _keys(obj) {
+        return _is_object(obj) ? Object.keys(obj) : [];
+      }
+
+      function _each(list, iter) {
+        const keys = _keys(list);
+        for (let i = 0; i < keys.length; i++) {
+          iter(list[keys[i]]);
+        }
+        return list;
+      }
+
+      function _map(list, mapper) {
+        let new_list = [];
+        _each(list, function(val) {
+          new_list.push(mapper(val));
+        });
+        return new_list;
+      }
+
+      console.log(
+        _map(users, function(user) {
+          return user.name;
+        })
+      );
+
+      // #1. values
+      // for value, not key
+      function _values(data) {
+        return _map(data, function(val) {
+          return val;
+        });
+      }
+
+      // _identity (from underscore.js)
+      function _identity(val) {
+        return val;
+      }
+
+      // _values2 that using _identity for assistant Ftn
+      function _values2(data) {
+        return _map(data, _identity);
+      }
+
+      console.log(users[0]); // key:value
+      console.log(_keys(users[0])); // only key
+      console.log(_values(users[0])); // only value
+      console.log(_values2(users[0])); // Also value
+
+      // more simpler version
+      function _curryR(Ftn) {
+        return function(a, b) {
+          return arguments.length == 2
+            ? Ftn(a, b)
+            : function(b) {
+                return Ftn(b, a);
+              };
+        };
+      }
+      const _mapR = _curryR(_map);
+      const _valuesR = _mapR(_identity); // declare Ftn as Variables
+
+      console.log(_valuesR); // ready to input data
+      console.log(_valuesR(users[0]));
+
+      // #2. pluck
+      function _pluck(data, key) {
+        return _map(data, function(obj) {
+          return obj[key];
+        });
+      }
+
+      console.log(_pluck(users, "age"));
+      console.log(_pluck(users, "name"));
+      console.log(_pluck(users, "id"));
+
+      // _get
+      function _get(obj, key) {
+        return obj == null ? undefined : obj[key];
+      }
+
+      const _getR = _curryR(_get);
+
+      // _pluck + _getR
+      function _pluckGet(data, key) {
+        return _map(data, _getR(key));
+      }
+
+      console.log(_pluckGet(users, "name"));
+      console.log(_pluckGet(users, "id"));
+      console.log(_pluckGet(users, "age"));
+    </script>
+  </body>
+</html>
