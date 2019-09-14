@@ -127,6 +127,64 @@
       console.log(_pluckGet(users, "name"));
       console.log(_pluckGet(users, "id"));
       console.log(_pluckGet(users, "age"));
+
+      // 2. To filter
+      function _filter(list, predi) {
+        let new_list = [];
+        _each(list, function(val) {
+          if (predi(val)) new_list.push(val);
+        });
+        return new_list;
+      }
+
+      console.log(
+        "_filter: ",
+        _filter(users, function(user) {
+          return user.age >= 30;
+        })
+      );
+
+      // # 1. reject
+      function _reject(data, predi) {
+        return _filter(data, function(val) {
+          return !predi(val);
+        });
+      }
+
+      console.log(
+        "_reject: ",
+        _reject(users, function(user) {
+          return user.age >= 30;
+        })
+      );
+
+      // _negate
+      function _negate(ftn) {
+        return function(val) {
+          return !ftn(val);
+        };
+      }
+
+      // _reject + _negate
+      function _rejectNegate(data, predi) {
+        return _filter(data, _negate(predi));
+      }
+      // => 함수의 중첩만 남았다.
+      // => 함수들의 응응과 조합을 강조하는 프로그래밍 방식.
+
+      console.log(
+        "_rejectNegate: ",
+        _rejectNegate(users, function(user) {
+          return user.age >= 30;
+        })
+      );
+
+      // # 2.compact
+      // only true
+      const _filterR = _curryR(_filter);
+      const _compact = _filterR(_identity);
+
+      console.log(_compact([1, 2, 3, 0, false, null, {}, undefined]));
     </script>
   </body>
 </html>
