@@ -21,11 +21,11 @@
       const users = [
         { id: 1, name: "junsik", age: 25 },
         { id: 2, name: "jinsik", age: 25 },
-        { id: 3, name: "jonsik", age: 39 },
-        { id: 4, name: "joongsik", age: 30 },
-        { id: 5, name: "junesick", age: 26 },
-        { id: 6, name: "junesik", age: 32 },
-        { id: 7, name: "jansik", age: 33 }
+        { id: 3, name: "konsik", age: 39 },
+        { id: 4, name: "koongsik", age: 30 },
+        { id: 5, name: "runesick", age: 26 },
+        { id: 6, name: "runesik", age: 33 },
+        { id: 7, name: "oansik", age: 33 }
       ];
 
       // 1. 수집하기 - map
@@ -370,11 +370,75 @@
         console.log
       );
 
+      console.clear();
+
       // water = data , stairway = Ftn
       // 계단따라 물은 변한다.
       // 결국 한 계단씩 타고 내려오는 건 물 = data.
 
-      // #2. group_by, push
+      // #2. group_by, _push
+      function _push(obj, key, val) {
+        (obj[key] = obj[key] || []).push(val);
+        return obj;
+      }
+
+      const _groupByR = _curryR(function(data, iter) {
+        return _reduce(
+          data,
+          function(grouped, val) {
+            let key = iter(val);
+            (grouped[key] = grouped[key] || []).push(val);
+            return grouped;
+          },
+          {}
+        );
+      });
+
+      // __groupByR + _push
+      // 변수 선언을 최대한 줄여나간다. 대입문 감소.
+      // function always have return
+      const _groupByRPush = _curryR(function(data, iter) {
+        return _reduce(
+          data,
+          function(grouped, val) {
+            return _push(grouped, iter(val), val);
+          },
+          {}
+        );
+      });
+
+      _go(
+        users,
+        _groupByR(function(user) {
+          return user.age;
+        }),
+        console.log
+      );
+
+      _go(users, _groupByRPush(_getR("age")), console.log);
+
+      _go(
+        users,
+        _groupByRPush(function(user) {
+          return user.age - (user.age % 10);
+        }),
+        console.log
+      ); // 10, 20, 30 ...
+
+      const _head = list => {
+        return list[0];
+      };
+
+      _go(
+        users,
+        _groupByRPush(function(user) {
+          return user.name[0]; // string[0] => first character
+        }),
+        console.log
+      );
+
+      _go(users, _groupByRPush(_pipe(_getR("name"), _head)), console.log);
+
       // #3. count_by, inc
     </script>
   </body>
