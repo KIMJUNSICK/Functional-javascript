@@ -152,6 +152,8 @@
         });
       }
 
+      const _rejectR = _curryR(_reject);
+
       console.log(
         "_reject: ",
         _reject(users, function(user) {
@@ -279,6 +281,101 @@
       // 고차함수를 고른다.
       // + 보조함수를 고른다.
       // => 필요한 로직을 만든다.
+
+      // 접기 - reduce
+      // #1. min, max, min_by, max_by
+      function _reduce(list, iter, memo) {
+        if (arguments.length == 2) {
+          memo = list[0];
+          list = list.slice(1); // but slice is Array method.
+          // it doesn't work in Array-like
+        }
+        _each(list, function(val) {
+          memo = iter(memo, val);
+        });
+        return memo;
+      }
+
+      // it's mine
+      function _min(list) {
+        memo = list[0];
+        _each(list, function(val) {
+          if (memo > val) {
+            memo = val;
+          }
+        });
+        return memo;
+      }
+
+      // 값이 순서대로 들어온다는 생각을 버려라.
+      // 데이터의 시점과 상관없는 프로그래밍을 해야한다.
+      // for문의 대체재로써 함수형프로그래밍을 하면 안된다.
+      // 오로지 값 a,b에 주목하자.
+      function _minReduce(data) {
+        return _reduce(data, function(a, b) {
+          return a < b ? a : b; // more simpler than 'if' statement
+        });
+      }
+
+      function _maxReduce(data) {
+        return _reduce(data, function(a, b) {
+          return a > b ? a : b; // more simpler than 'if' statement
+        });
+      }
+
+      console.log("_min:", _min([1, -4, 2, 3]));
+      console.log("_minReduce:", _minReduce([1, 2, 3, 4, -4]));
+      console.log("-maxReduce:", _maxReduce([1, 2, 3, -4, 100]));
+
+      // min_by, max_by
+      // 보조함수를 통해 다형성이 올라간다.
+      const _min_by = (data, iter) => {
+        return _reduce(data, function(a, b) {
+          return iter(a) < iter(b) ? a : b;
+        });
+      };
+
+      const _max_by = (data, iter) => {
+        return _reduce(data, function(a, b) {
+          return iter(a) > iter(b) ? a : b;
+        });
+      };
+
+      console.log(_min_by([1, 2, 3, -4], Math.abs));
+      console.log(_max_by([1, 2, 3, 4, -5], Math.abs));
+      console.log(
+        _max_by(users, function(user) {
+          return user.age;
+        })
+      );
+      console.log(_max_by(users, _getR("age")));
+      console.log(_min_by(users, _getR("age")));
+
+      const _minByR = _curryR(_min_by);
+      const _maxByR = _curryR(_max_by);
+
+      // _go + _filterR(_rejectR) +  minByR (maxByR) + _getR
+      _go(
+        users,
+        _filterR(user => user.age >= 30),
+        _minByR(_getR("age")),
+        console.log
+      );
+
+      _go(
+        users,
+        _rejectR(user => user.age >= 30),
+        _maxByR(_getR("age")),
+        _getR("name"),
+        console.log
+      );
+
+      // water = data , stairway = Ftn
+      // 계단따라 물은 변한다.
+      // 결국 한 계단씩 타고 내려오는 건 물 = data.
+
+      // #2. group_by, push
+      // #3. count_by, inc
     </script>
   </body>
 </html>
