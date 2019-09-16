@@ -439,7 +439,57 @@
 
       _go(users, _groupByRPush(_pipe(_getR("name"), _head)), console.log);
 
+      const v1 = _go(users, _groupByRPush(_pipe(_getR("name"), _head)));
       // #3. count_by, inc
+      // _inc
+      function _inc(count, key) {
+        count[key] ? count[key]++ : (count[key] = 1);
+        return count;
+      }
+
+      function _count_by(data, iter) {
+        return _reduce(
+          data,
+          function(count, val) {
+            let key = iter(val);
+            count[key] ? count[key]++ : (count[key] = 1);
+            return count;
+          },
+          {}
+        );
+      }
+
+      // _count_by + _inc
+      function _countByInc(data, iter) {
+        return _reduce(
+          data,
+          function(count, val) {
+            return _inc(count, iter(val));
+          },
+          {}
+        );
+      }
+
+      console.log(
+        _count_by(users, function(user) {
+          return user.age;
+        })
+      );
+      console.log(
+        _count_by(users, function(user) {
+          return user.age - (user.age % 10);
+        })
+      );
+      console.log(
+        _count_by(users, function(user) {
+          return user.name[0];
+        })
+      );
+      console.log(
+        _countByInc(users, function(user) {
+          return user.name[0];
+        })
+      );
     </script>
   </body>
 </html>
