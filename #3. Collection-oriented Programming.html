@@ -19,6 +19,9 @@
       // => 목표: 문제(상황)에 맞게 알맞는 함수를 꺼내쓴다.
 
       const users = [
+        { id: 8, name: "junsujikik", age: 15 },
+        { id: 9, name: "juzxnsik", age: 17 },
+        { id: 10, name: "junsbnnbvik", age: 16 },
         { id: 1, name: "junsik", age: 25 },
         { id: 2, name: "jinsik", age: 25 },
         { id: 3, name: "konsik", age: 39 },
@@ -44,15 +47,15 @@
       function _each(list, iter) {
         const keys = _keys(list);
         for (let i = 0; i < keys.length; i++) {
-          iter(list[keys[i]]);
+          iter(list[keys[i]], keys[i]);
         }
         return list;
       }
 
       function _map(list, mapper) {
         let new_list = [];
-        _each(list, function(val) {
-          new_list.push(mapper(val));
+        _each(list, function(val, key) {
+          new_list.push(mapper(val, key));
         });
         return new_list;
       }
@@ -490,6 +493,71 @@
           return user.name[0];
         })
       );
+
+      _map([1, 2, 3], console.log); // value: key
+      _map(users[0], console.log); // 배열 안에 객체에 대한 정보를 반복적으로 확인한다면...
+
+      const _pairsR = _mapR(function(val, key) {
+        return [key, val];
+      });
+
+      const _pairsArrowR = _mapR((val, key) => [key, val]);
+
+      console.log(_pairsR(users[0]));
+      console.log(_pairsArrowR(users[0]));
+
+      console.clear();
+
+      const _document_write = document.write.bind(document);
+      const _countByR = _curryR(_count_by);
+
+      _go(
+        users,
+        _filterR(function(user) {
+          return user.age >= 20;
+        }),
+        _countByR(function(user) {
+          return user.age - (user.age % 10);
+        }),
+        _mapR(function(count, key) {
+          return `<li>${key}대는 ${count}명이다</li>`;
+        }),
+        list => "<ul>" + list.join(" ") + "</ul>",
+        _document_write
+      );
+
+      // 큰 함수로 만들 수도
+      const _f1 = _pipe(
+        _countByR(function(user) {
+          return user.age - (user.age % 10);
+        }),
+        _mapR(function(count, key) {
+          return `<li>${key}대는 ${count}명이다</li>`;
+        }),
+        list => "<ul>" + list.join(" ") + "</ul>",
+        _document_write
+      );
+
+      _f1(users);
+
+      // 조합은 언제나 가능하도록.
+      // 이게 함수형프로그래밍이다.
+      // 안정성과 다형성이 높은 코딩이 훌륭한 FP.
+      // => 다형성이 높다는 건 그만큼 모듈화가 잘 되었다는 의미.
+      // 하나하나 분리해서 테스트하기 좋다.
+      const _f2 = _pipe(_rejectR(user => user.age < 20), _f1);
+
+      _f2(users);
+
+      _go(users, _rejectR(user => user.age < 20), _f1);
+
+      // 2번 이상 반복된다면
+      // 함수를 필요에 따라 만들면 된다.
+      // 하지만 특정한 상황이 자주 발생되지 않는다면
+      // 그냥 화살표함수로 간단히 표현.
+
+      // 코딩도 물론 중요하지만
+      // => 필요와 상황을 먼저 읽는 것이 더 중요하다.
     </script>
   </body>
 </html>

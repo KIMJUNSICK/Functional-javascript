@@ -60,10 +60,6 @@ var _map = _curryr(_map),
   _each = _curryr(_each),
   _filter = _curryr(_filter);
 
-var _pairs = _map(function(val, key) {
-  return [key, val];
-});
-
 var slice = Array.prototype.slice;
 function _rest(list, num) {
   return slice.call(list, num || 1);

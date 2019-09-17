@@ -49,11 +49,11 @@
 
 ## 3. Collection-oriented Programming
 
-- [ ] To Collect - map, values, pluck
-- [ ] To Filter - reject, compact
-- [ ] To Find - find, find_index, some, every
-- [ ] To Fold - reduce, min_by, max_by
-- [ ] To Fold - group_by, count_by
+- [x] To Collect - map, values, pluck
+- [x] To Filter - reject, compact
+- [x] To Find - find, find_index, some, every
+- [x] To Fold - reduce, min_by, max_by
+- [x] To Fold - group_by, count_by
 
 ## 4. Lazy Evaluation in Javascript
 
