@@ -5,8 +5,110 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
     <title>Lazy evaluation</title>
+    <script src="js/partial.js"></script>
   </head>
   <body>
-    <script></script>
+    <script>
+      // 지연평가를 시작하고 이어가는 함수
+      // #1. map
+      // #2. filter, reject
+
+      // 끝내는 함수
+      // #1. take
+      // #2. some, every, find
+
+      let mi = 0;
+      let fi = 0;
+
+      _.go(
+        _.range(100),
+        _.map(function(val) {
+          mi++;
+          return val * val;
+        }),
+        _.filter(function(val) {
+          fi++;
+          return val % 2;
+        }),
+        _.take(13),
+        console.log
+      );
+      // strict evaluation ,not lazy evalutaion
+      // => There is room for optimization
+      // through Lazy evaluation.
+
+      console.log(mi, fi); // => _.map & _.filter Ftn을 100번 반복했다.
+
+      let miL = 0;
+      let fiL = 0;
+
+      _.go(
+        _.range(100),
+        L.map(function(val) {
+          miL++;
+          return val * val;
+        }),
+        L.filter(function(val) {
+          fiL++;
+          return val % 2;
+        }),
+        L.take(5),
+        console.log
+      );
+
+      // 한 개의 데이터마다 작업한다.
+      // 내부적으로 순서를 재구성.
+      // 그래서 10번만 반복.
+      // FP이며 순수함수라서 지연평가가 가능하다.
+      // 함수형 프로그래밍의 큰 매력 중 하나이다.
+
+      console.log(miL, fiL);
+      // 반복횟수가 1/10로 => 최적화
+
+      // lazy evalutaion's direction differ from strict evaluation
+      // L is data-focused, S condition-focused
+
+      let mis = 0;
+      let fis = 0;
+
+      _.go(
+        _.range(100),
+        _.map(function(val) {
+          mis++;
+          return val * val;
+        }),
+        _.filter(function(val) {
+          fis++;
+          return val % 2;
+        }),
+        _.some(function(val) {
+          return val > 100;
+        }),
+        console.log
+      );
+
+      console.log(mis, fis);
+
+      let miLs = 0;
+      let fiLs = 0;
+
+      _.go(
+        _.range(100),
+        L.map(function(val) {
+          miLs++;
+          return val * val;
+        }),
+        L.filter(function(val) {
+          fiLs++;
+          return val % 2;
+        }),
+        L.some(function(val) {
+          return val > 100;
+        }),
+        console.log
+      );
+
+      console.log(miLs, fiLs);
+    </script>
   </body>
 </html>
