@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Users | Posts | Comments</title>
+    <script src="js/partial.js"></script>
+  </head>
+  <body>
+    <script>
+      const users = [
+        { id: 101, name: "ID" },
+        { id: 102, name: "BJ" },
+        { id: 103, name: "PJ" },
+        { id: 104, name: "HA" },
+        { id: 105, name: "JE" },
+        { id: 106, name: "JI" }
+      ];
+      const posts = [
+        { id: 201, body: "내용1", user_id: 101 },
+        { id: 202, body: "내용2", user_id: 102 },
+        { id: 203, body: "내용3", user_id: 103 },
+        { id: 204, body: "내용4", user_id: 102 },
+        { id: 205, body: "내용5", user_id: 101 }
+      ];
+      const comments = [
+        { id: 301, body: "댓글1", user_id: 105, post_id: 201 },
+        { id: 302, body: "댓글2", user_id: 104, post_id: 201 },
+        { id: 303, body: "댓글3", user_id: 104, post_id: 202 },
+        { id: 304, body: "댓글4", user_id: 105, post_id: 203 },
+        { id: 305, body: "댓글5", user_id: 106, post_id: 203 },
+        { id: 306, body: "댓글6", user_id: 106, post_id: 204 },
+        { id: 307, body: "댓글7", user_id: 102, post_id: 205 },
+        { id: 308, body: "댓글8", user_id: 103, post_id: 204 },
+        { id: 309, body: "댓글9", user_id: 103, post_id: 202 },
+        { id: 310, body: "댓글10", user_id: 105, post_id: 201 }
+      ];
+
+      // 1. 특정인의 posts의 모든 comments 거르기
+
+      _.go(
+        posts,
+        _.filter(function(post) {
+          return post.user_id === 101;
+        }),
+        function(posts) {
+          return _.filter(comments, function(comment) {
+            return _.find(posts, function(post) {
+              return post.id === comment.post_id;
+            }); // true or false
+          });
+        },
+        console.log
+      );
+
+      _.go(
+        posts,
+        _.filter(function(post) {
+          return post.user_id === 101;
+        }),
+        _.map(function(post) {
+          return post.id;
+        }),
+        function(post_ids) {
+          return _.filter(comments, function(comment) {
+            return _.contains(post_ids, comment.post_id);
+          }); // post_ids에 comment.post_id가 포함되어 있는가?
+        },
+        console.log
+      );
+
+      _.go(
+        posts,
+        _.filter(function(post) {
+          return post.user_id === 101;
+        }),
+        _.pluck("id"),
+        function(post_ids) {
+          return _.filter(comments, function(comment) {
+            return _.contains(post_ids, comment.post_id);
+          }); // post_ids에 comment.post_id가 포함되어 있는가?
+        },
+        console.log
+      );
+
+      _.go(
+        posts,
+        _.where({ user_id: 101 }),
+        // predi's expression is key:value
+        // more simpler
+        _.pluck("id"),
+        function(post_ids) {
+          return _.filter(comments, function(comment) {
+            return _.contains(post_ids, comment.post_id);
+          }); // post_ids에 comment.post_id가 포함되어 있는가?
+        },
+        console.log
+      );
+
+      console.clear();
+
+      // 2. 특정인의 posts에 comments를 단 친구의 이름을 뽑기
+      _.go(
+        posts,
+        _.filter(function(post) {
+          return post.user_id === 101;
+        }),
+        _.map(function(post) {
+          return post.id;
+        }),
+        function(post_ids) {
+          return _.filter(comments, function(comment) {
+            return _.contains(post_ids, comment.post_id);
+          });
+        },
+        _.map(function(comment) {
+          return _.find(users, function(user) {
+            return user.id == comment.user_id;
+          }).name;
+        }),
+        _.uniq, // Deduplication
+        console.log
+      );
+
+      const post_by = attri => _.where(posts, attri);
+
+      const commentsByPosts = _.pipe(
+        _.pluck("id"),
+        function(post_ids) {
+          return _.filter(comments, function(comment) {
+            return _.contains(post_ids, comment.post_id);
+          });
+        }
+      );
+
+      _.go(
+        { user_id: 101 },
+        post_by,
+        commentsByPosts,
+        _.pluck("user_id"),
+        function(user_ids) {
+          return _.filter(users, function(user) {
+            return _.contains(user_ids, user.id);
+          });
+        },
+        _.pluck("name"),
+        console.log
+      );
+
+      // 실무에서 반복되는 경우가 2번 이상 생긴다면
+      // 바로 함수를 응용해 중복제거와 간결한 표현을 지향해서
+      // 함수를 작성
+
+      // 3. 특정인의 posts에 comments를 단 친구들 카운트 정보
+      _.go(
+        { user_id: 101 },
+        post_by,
+        commentsByPosts,
+        _.map(function(comment) {
+          return _.find(users, function(user) {
+            return comment.user_id == user.id;
+          }).name;
+        }),
+        _.count_by, // array => key:value
+        console.log
+      );
+
+      // 특정 문제가 반복된다면 문제에 맞게 보다 큰 함수를 작성한다.
+      // 현실에서 메뉴얼 만들듯이.
+
+      // 4. 특정인이 comment를 단 posts 거르기
+      _.go(
+        comments,
+        _.where({ user_id: 105 }),
+        _.pluck("post_id"),
+        function(post_ids) {
+          return _.filter(posts, function(post) {
+            return _.contains(post_ids, post.id);
+          });
+        },
+        console.log
+      );
+
+      // 5. users + posts + comments (index_by & group by로 효율 높이기)
+      // 5.1 특정인의 posts의 모든 comments 거르기
+      // 5.2 특정인의 posts에 comments를 단 친구의 이름을 뽑기
+      // 5.3 특정인의 posts에 comments를 단 친구들 카운트 정보
+      // 5.4 특정인이 comment를 단 posts 거르기
+    </script>
+  </body>
+</html>
