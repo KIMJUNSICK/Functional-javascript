@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Async</title>
+    <script src="js/partial.js"></script>
+    <script src="js/_.js"></script>
+  </head>
+  <body>
+    <script>
+      function square(a) {
+        return new Promise(function(resolve) {
+          setTimeout(function() {
+            resolve(a * a);
+          }, 500);
+        });
+      }
+
+      console.log(square); // return: Ftn
+      console.log(square(10)); // input arg => return: Promise{<pending>}
+      // Promise Obj
+      // 나중에 결과를 만들 준비가 되어있다, 나중에 결과가 오기를 약속되어있는 객체
+
+      //   square(10).then(function(res) {
+      //     console.log(res);
+      //   }); // after 3 seconds  => return 100
+
+      // return order
+      // Sequence written from top to bottom is not return order
+      console.log(1); // first
+      square(10).then(function(res) {
+        console.log(3); // third
+        console.log(res); // fourth
+      });
+      console.log(2); // second
+
+      // callback => Promise => async/await
+
+      // Promise & then
+      square(10)
+        .then(square)
+        .then(square)
+        .then(square)
+        .then(console.log);
+
+      // FP style
+      _.go(square(10), square, square, square, console.log);
+
+      // difference between Promise and _.go
+      // not async ftn
+      // => not change login in _.go
+      // but Promise occur error
+
+      const square2 = a => a * a;
+
+      _.go(square2(10), square2, square2, square2, console.log);
+
+      //   square2(10)
+      //     .then(square2) // data flow from up to bottom
+      //     .then(square2)
+      //     .then(square2)
+      //     .then(console.log);
+      //   // error
+
+      // example for explaning limits of Promise
+
+      console.clear();
+
+      // Promise version(imperative programming), not FP
+      const list = [2, 3, 4];
+      new Promise(function(resolve) {
+        (function recur(res) {
+          if (res.length == list.length) return resolve(res);
+          square(list[res.length]).then(function(val) {
+            res.push(val);
+            recur(res);
+          });
+        })([]);
+      }).then(console.log);
+
+      // FP version
+      _.go(list, _.map(square), console.log);
+
+      // pure Ftn
+      // =. You don't have to worry about the timing.
+      // => combination
+      // => The asynchronous system is handled synchronously.
+
+      // more simpler & easy than Promise
+      _.go(
+        list,
+        _.map(square),
+        _.map(square),
+        _.map(square),
+        _.map(square),
+        console.log
+      );
+    </script>
+  </body>
+</html>
