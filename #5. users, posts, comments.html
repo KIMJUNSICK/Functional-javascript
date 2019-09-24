@@ -182,8 +182,113 @@
         console.log
       );
 
+      console.clear();
       // 5. users + posts + comments (index_by & group by로 효율 높이기)
+      // 데이터를 새로 구성하지만 원본은 그대로, immutable
+
+      // const comments2 = _.map(comments, function(comment) {
+      //   comment.user = { id: 1 };
+      //   return comment;
+      // });
+
+      // console.log(comments2);
+      // console.log(comments);
+      //  => data origin is changed => mutable
+      // not FP
+
+      const comments2 = _.map(comments, function(comment) {
+        return _.extend(
+          {
+            user: _.find(users, function(user) {
+              return user.id == comment.user_id;
+            })
+          },
+          comment
+        );
+      }); // too much repetition
+
+      const users2 = _.index_by(users, "id");
+      console.log(users2); // indexing by 'id'
+      // Array => normal Obj(index is 'id')
+      // not loop, find by index
+      // => more efficient than before
+
+      const findUserById = user_id => {
+        return _.find(user2, function(user) {
+          return user.id == user_id;
+        });
+      }; // loop
+
+      const findUserById2 = user_id => {
+        return users2[user_id];
+      }; // not loop
+
+      const comments3 = _.map(comments, function(comment) {
+        return _.extend(
+          {
+            user: findUserById2(comment.user_id) // indexing by 'id'
+          },
+          comment
+        );
+      }); // more efficient than before
+
+      console.log(comments);
+      console.log(comments2);
+      console.log(comments3);
+
+      console.clear();
+
+      const comments4 = _.index_by(comments3, "post_id");
+      // 1:1 key:value pairs
+
+      const commentsGroupBy = _.go(
+        comments,
+        _.group_by("user_id") // not 1:1 // Array
+      );
+
+      console.log(commentsGroupBy);
+
+      // const commentsById =
+      const posts2 = _.map(posts, function(post) {
+        return _.extend(
+          {
+            comments: commentsGroupBy[post.id]
+          },
+          {
+            user: findUserById2(post.user_id)
+          },
+          post
+        );
+      });
+
+      console.log(posts2);
+
+      const postsGroupBy = _.go(
+        posts,
+        _.group_by("user_id") // not 1:1 // Array
+      );
+
+      // 참조값을 다루는 데 능숙하고 immutable에 신경쓰면
+      // 많은 문제가 쉽게 해결된다.
+
+      const user3 = _.map(users2, function(user) {
+        return _.extend(
+          {
+            posts: posts2[user.id] || []
+          },
+          user
+        );
+      });
+
+      console.log(user3);
       // 5.1 특정인의 posts의 모든 comments 거르기
+      _.go(
+        posts,
+        _.filter(function(post) {
+          return post.user_id === 101;
+        }),
+        console.log
+      );
       // 5.2 특정인의 posts에 comments를 단 친구의 이름을 뽑기
       // 5.3 특정인의 posts에 comments를 단 친구들 카운트 정보
       // 5.4 특정인이 comment를 단 posts 거르기

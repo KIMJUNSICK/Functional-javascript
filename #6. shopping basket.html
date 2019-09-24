@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Shopping Basket</title>
+    <script src="js/partial.js"></script>
+    <script src="js/_.js"></script>
+  </head>
+  <body>
+    <script>
+      var products = [
+        {
+          is_selected: true, // <--- 장바구니에서 체크 박스 선택
+          name: "반팔티",
+          price: 10000, // <--- 기본 가격
+          sizes: [
+            // <---- 장바구니에 담은 동일 상품의 사이즈 별 수량과 가격
+            { name: "L", quantity: 4, price: 0 },
+            { name: "XL", quantity: 2, price: 0 },
+            { name: "2XL", quantity: 3, price: 2000 } // <-- 옵션의 추가 가격
+          ]
+        },
+        {
+          is_selected: true,
+          name: "후드티",
+          price: 21000,
+          sizes: [
+            { name: "L", quantity: 2, price: -1000 },
+            { name: "2XL", quantity: 4, price: 2000 }
+          ]
+        },
+        {
+          is_selected: false,
+          name: "맨투맨",
+          price: 16000,
+          sizes: [{ name: "L", quantity: 10, price: 0 }]
+        }
+      ];
+
+      //1. 모든 수량
+      const totalQ = _.pipe(
+        _.reduce(function(tq, product) {
+          return _.reduce(
+            product.sizes,
+            function(tq, size) {
+              return tq + size.quantity;
+            },
+            tq // tq = 0
+          ); // 4+2+3 / 2+4 / 10
+        }, 0) // 9+6+10
+      );
+      // FP is characteristic of putting Ftn in variable
+      // => Ftn may be reused at any point in time
+
+      //2. 선택 된 총 수량
+      _.go(
+        products,
+        _.filter(_get("is_selected")),
+        // _get("is_selected") => true => _.filter(true) => return value that predicated
+        totalQ,
+        console.log
+      );
+
+      //3. 모든 가격
+      const totalP = _.pipe(
+        _.reduce(function(tp, product) {
+          return _.reduce(
+            product.sizes,
+            function(tp, size) {
+              return tp + size.quantity * (product.price + size.price);
+            },
+            tp
+          );
+        }, 0)
+      );
+
+      _.go(products, totalP, console.log);
+
+      //4. 선택 된 총 가격
+      _.go(
+        products,
+        _.filter(function(product) {
+          return product.is_selected == true;
+        }),
+        totalP,
+        console.log
+      );
+    </script>
+  </body>
+</html>
